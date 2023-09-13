@@ -104,3 +104,78 @@ memmove(void *vdst, const void *vsrc, int n)
     *dst++ = *src++;
   return vdst;
 }
+
+//************************************ 611 Assignment Methods **************************************************
+// This function reads the data from the file descriptor either to the end of line or max length and stores in the buffer.
+int readline(int fd, char *buf, int max_len) {
+    int i = 0;
+    char c;
+
+    while (i < max_len - 1) {
+        int n = read(fd, &c, 1);
+        if (n <= 0 || c == '\n') {
+            break;
+        }
+        buf[i++] = c;
+    }
+    buf[i] = '\0';
+    return i;
+}
+
+void toLower(char *str) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] >= 'A' && str[i] <= 'Z') {
+            // Convert uppercase character to lowercase by adding ASCII offset
+            str[i] = str[i] + ('a' - 'A');
+        }
+    }
+}
+
+void uniq_us(int fd,char *uflag) {
+  char current_line[80]="";
+  char previous_line[80]="";
+  char previous_line_1[80]="";
+  char current_line_1[80]="";
+
+    int bytesRead;
+    int lineCount=1;
+    
+   // while ((bytesRead = readline(fd, current_line, sizeof(current_line))) > 0) { 
+    while ((bytesRead = readline(fd, current_line,80)) > 0) {     
+            if (strcmp(previous_line,"") == 0) {
+                strcpy(previous_line,current_line); 
+                lineCount=1;
+            } 
+            else if (strcmp(uflag,"-i") == 0) {
+                strcpy(current_line_1,current_line); 
+                strcpy(previous_line_1,previous_line); 
+                toLower(current_line_1);
+                toLower(previous_line_1);
+                if (strcmp(current_line_1, previous_line_1) != 0) {
+                    printf(1,"%s\n",previous_line);
+                    strcpy(previous_line,current_line);
+                }
+            }
+            else if (strcmp(current_line, previous_line) != 0) {
+                if (strcmp(uflag,"-c") == 0) 
+                    printf(1,"%d\t%s\n",lineCount,previous_line);
+                else if ( (strcmp(uflag,"-d") == 0 && lineCount >1 ) ||  (strcmp(uflag,"-g") == 0))
+                    printf(1,"%s\n",previous_line);
+
+                strcpy(previous_line,current_line);
+                lineCount=1;  // resets the line count
+            }  
+            else 
+                lineCount = lineCount + 1;
+    }
+    if (strcmp(previous_line,"") != 0 ) {
+        if (strcmp(uflag,"-c") == 0)
+            printf(1,"%d\t%s\n",lineCount,previous_line);
+        else if ( (strcmp(uflag,"-d") == 0 && lineCount >1 ) 
+                        ||  (strcmp(uflag,"-i") == 0) ||  (strcmp(uflag,"-g") == 0))
+            printf(1,"%s\n",previous_line);
+    }
+    else {
+        printf(1,"\n");
+    }    
+}
