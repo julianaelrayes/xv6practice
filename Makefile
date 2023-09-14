@@ -177,15 +177,19 @@ UPROGS=\
 	_mkdir\
 	_rm\
 	_sh\
-	_stressfs\
-	_usertests\
+	_uniq_user\
+	_uniq_kernel\
+	_head_user\
+	_head_kernel\
+#	_usertests\
 	_wc\
 	_zombie\
-	_uniqus\
-	_uniqks\
+	_stressfs\
 
-fs.img: mkfs README OS611Example.txt OS611.txt $(UPROGS)
-	./mkfs fs.img README OS611Example.txt OS611.txt $(UPROGS)
+
+
+fs.img: mkfs README OS611Example.txt head_example.txt OS611.txt $(UPROGS)
+	./mkfs fs.img README OS611Example.txt head_example.txt OS611.txt $(UPROGS)
 
 -include *.d
 
@@ -198,7 +202,7 @@ clean:
 
 # make a printout
 FILES = $(shell grep -v '^\#' runoff.list)
-PRINT = runoff.list runoff.spec README OS611.txt OS611Example.txt toc.hdr toc.ftr $(FILES)
+PRINT = runoff.list runoff.spec README OS611.txt head_example.txt OS611Example.txt toc.hdr toc.ftr $(FILES)
 
 xv6.pdf: $(PRINT)
 	./runoff
@@ -253,9 +257,9 @@ EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
 	printf.c umalloc.c\
-	uniqus.c\
-	uniqks.c\
-	README OS611.txt OS611Example.txt dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
+	uniq_user.c uniq_kernel.c\
+	head_user.c head_kernel.c\
+	README OS611.txt OS611Example.txt head_example.txt dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 
 dist:

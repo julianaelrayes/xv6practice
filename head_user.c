@@ -6,10 +6,10 @@
 
 void head(int fd, int nlines) {
     char buf[512];
-    int n;
+    int n = -1;
     int lines = 0;
 
-    while ((n = read(fd, buf, sizeof(buf))) > 0 && lines < nlines) {
+    while (lines < nlines && (n = read(fd, buf, sizeof(buf))) > 0) {
         for (int i = 0; i < n; i++) {
             if (buf[i] == '\n') {
                 lines++;
@@ -22,15 +22,14 @@ void head(int fd, int nlines) {
     }
 
     // Add an extra newline if the specified number of lines is reached
-    if (lines == nlines) {
-        printf(1, "\n");
-    }
+    printf(1,"\n");
+   
 }
 
 int main(int argc, char *argv[]) {
     int nlines = DEFAULT_NLINES;
     int fd;
-
+	printf(1,"********************* Head Command is getting Executed in User Space ******************************\n");
     if (argc > 1 && argv[1][0] == '-') {
         nlines = atoi(&argv[1][1]);
         if (nlines <= 0) {

@@ -103,7 +103,8 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
-extern int sys_uniq_ks(void);
+extern int sys_uniq_kernel(void);
+extern int sys_head_kernel(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -127,7 +128,8 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_uniq_ks] sys_uniq_ks 
+[SYS_uniq_kernel] sys_uniq_kernel,
+[SYS_head_kernel] sys_head_kernel,
 };
 
 void

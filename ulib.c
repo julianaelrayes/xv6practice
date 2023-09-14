@@ -131,7 +131,7 @@ void toLower(char *str) {
     }
 }
 
-void uniq_us(int fd,char *uflag) {
+void uniq_user(int fd,char *uflag) {
   char current_line[80]="";
   char previous_line[80]="";
   char previous_line_1[80]="";

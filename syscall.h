@@ -20,4 +20,5 @@
 #define SYS_link   19
 #define SYS_mkdir  20
 #define SYS_close  21
-#define SYS_uniq_ks 22
+#define SYS_uniq_kernel 22
+#define SYS_head_kernel 23

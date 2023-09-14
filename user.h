@@ -38,5 +38,6 @@ void* malloc(uint);
 void free(void*);
 int atoi(const char*);
 
-void uniq_us(int fd,char *uflag);
-int uniq_ks(char *filename,char *flag);
+void uniq_user(int fd,char *uflag);
+int uniq_kernel(char *filename,char *flag);
+int head_kernel(char *filename, int nlines, int inputType);

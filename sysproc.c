@@ -36,11 +36,11 @@ int readline(struct inode *ip, char *buf,int startPosition, int max_len) {
         buf[total] = '\0';
     int index=0;
     for (; index < strlen(buf);index++)
-      if (buf[index] == '\n') { 
+      if (buf[index] == '\n' || index >= total) {
           buf[index] = '\0';
           break;
       }
-
+    //cprintf("Readline:%d\t%d\n",total,index);
     return index;
 }
 void toLower(char *str) {
@@ -51,32 +51,24 @@ void toLower(char *str) {
         }
     }
 }
-int getline_array(int offset, char *data, char *line) {
-    int arrayIndex = 0;
-    int index = offset;
-    
-    while (data[index] != '\0' && data[index] != '\n') {
+int getline_array(int offset,char *data,char *line) {
+    int  arrayIndex=0;
+    int index=offset;
+    if (offset >= strlen(data))
+       return -1;
+    for (; index < strlen(data);index++) {
         line[arrayIndex] = data[index];
-        arrayIndex++;
-        index++;
+        
+        if (data[index] == '\n')  {
+            line[arrayIndex] = '\0';
+            break; 
+        }
+        else 
+            arrayIndex++;
     }
-    
-    if (data[index] == '\n') {
-        // Include the newline character in the line
-        line[arrayIndex] = data[index];
-        arrayIndex++;
-        index++;
-    }
-    
-    line[arrayIndex] = '\0'; // Null-terminate the line
-    if (data[index] == '\0') {
-        return -1; // Signal that there are no more lines
-    }
-    
-    return index; // Move index to the next character
+    return index;
 }
-
-int sys_uniq_ks(void) {
+int sys_uniq_kernel(void) {
   char *filename;
   char *flag;
   
@@ -109,11 +101,6 @@ int sys_uniq_ks(void) {
       buffer[i] = '\0';
       //cprintf("%s\n\n************************************** Parsing**********************\n",buffer);
       int offset = 0;
-      
-      //char current_line[BUF_SIZE]="";
-      //char previous_line[BUF_SIZE]="";
-      //char previous_line_1[80]="";
-      //char current_line_1[80]="";
 
       while ((offset = getline_array(offset,buffer,current_line)) > 0) 
       {
@@ -156,11 +143,12 @@ int sys_uniq_ks(void) {
           }
           ilock(ip);
               
-              while ( (bytesRead = readline(ip,current_line ,indexCounter,BUF_SIZE)) > 0) 
+              while ( (bytesRead = readline(ip,current_line,indexCounter,BUF_SIZE)) > 0) 
               {
                   if (bytesRead < 0)
                     break;
                   indexCounter = indexCounter + bytesRead + 1;
+                   
                   //cprintf("Index Counter : %d\n",indexCounter);
                   if (strcmp(previous_line,"") == 0) {
                       strcpy(previous_line,current_line); 
@@ -181,12 +169,14 @@ int sys_uniq_ks(void) {
                           cprintf("%d\t%s\n",lineCount,previous_line);
                       else if ( (strcmp(flag,"-d") == 0 && lineCount >1 ) ||  (strcmp(flag,"-g") == 0))
                           cprintf("%s\n",previous_line);
-
+                      //cprintf("Before Copy:\t%s\t\t%s\n",previous_line,current_line);
                       strcpy(previous_line,current_line);
+                      //cprintf("After Copy:\t%s\t\t%s\n",previous_line,current_line);
                       lineCount=1;
                   }  
                   else 
                       lineCount = lineCount + 1;
+                  
               }
 
               if (strcmp(previous_line,"") != 0 ) 
@@ -207,6 +197,73 @@ int sys_uniq_ks(void) {
   return 0;
 }
 
+
+int sys_head_kernel(void){
+  char *filename;
+  int  linecount;
+  int  inputType; //0: Standard Input 1: File Name
+  
+  if(argstr(0, &filename) < 0  || argint(1, &linecount) < 0 || argint(2, &inputType) < 0 )
+    return -1;
+  
+  if (inputType == 0) {
+      char buffer[1024];
+      char c;
+      struct file *f = myproc()->ofile[0]; // Access stdin
+     
+      int inbytes = -1;
+      int i = 0;
+      int lines = 1;
+      while ( (inbytes = fileread(f, &c,1)) > 0) 
+      {
+        if (inbytes < 0) {
+          // cprintf("Read Bytes :%d\n",inbytes);
+          break;
+        }
+        else {
+          if (c == '\n')  {
+            buffer[i++] = '\0';
+            cprintf("%s\n",buffer);
+            memset(buffer, '\0', sizeof(buffer)); //reset the array
+            lines = lines + 1;
+            i = 0;
+            if (lines > linecount) 
+              break;
+          }
+          else
+            buffer[i++] = c;  
+        }
+      }
+  }
+  else {
+      //cprintf("File Name:%s and lines:%d\n",filename,linecount);
+      int readlines=1;
+      int bytesRead = 0;
+      int  indexCounter=0;
+      char current_line[1024]="";
+      begin_op();
+          struct inode *ip;
+          if ((ip=namei(filename)) == 0) {
+            end_op();
+            cprintf("File Not Found ....\n");
+            return -1; //File Not Found
+          }
+          ilock(ip);
+              while ( readlines <= linecount &&  (bytesRead = readline(ip,current_line,indexCounter,BUF_SIZE)) > 0) 
+              {
+                  if (bytesRead < 0)
+                    break;
+                  indexCounter = indexCounter + bytesRead + 1;
+
+                  cprintf("%s\n",current_line);
+                  readlines = readlines + 1;
+              }
+              cprintf("\n");
+          iunlock(ip);
+      end_op();
+  }
+  return linecount;
+}
 
 //********************************************Above Methods are added for Assignment 611 ********************************************
 int
