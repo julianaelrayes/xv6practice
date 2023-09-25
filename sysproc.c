@@ -7,7 +7,7 @@
 #include "mmu.h"
 #include "proc.h"
 
-#define BUF_SIZE 80
+#define BUF_SIZE 256
 #define O_RDONLY  0x000
 
 
