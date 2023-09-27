@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 O! say can you see by the dawn's early light,
 ⁠What so proudly we hailed at the twilight's last gleaming,
 Whose broad stripes and bright stars through the perilous fight,
@@ -30,3 +31,27 @@ Then conquer we must, when our cause it is just,
 And this be our motto—"In God is our Trust;"
 ⁠And the star-spangled Banner in triumph shall wave,
 O'er the Land of the Free and the Home of the Brave.
+=======
+1 We hold these truths to be self-evident, 
+2 that all men are created equal, 
+3 that they are endowed by their Creator with certain unalienable Rights,
+4 that among these are Life, Liberty and the pursuit of Happiness.
+5 That to secure these rights, Governments are instituted among Men, 
+6 deriving their just powers from the consent of the governed,
+7 That whenever any Form of Government becomes destructive of these ends, 
+8 it is the Right of the People to alter or to abolish it, 
+9 and to institute new Government, 
+10 laying its foundation on such principles and organizing its powers in such form,
+11 as to them shall seem most likely to effect their Safety and Happiness.
+12 Prudence, indeed, will dictate that Governments long established should not be changed for light and transient causes;
+13 and accordingly all experience hath shewn, that mankind are more disposed to suffer, 
+14 while evils are sufferable, than to right themselves by abolishing the forms to which they are accustomed.
+15 But when a long train of abuses and usurpations, 
+16 pursuing invariably the same Object evinces a design to reduce them under absolute Despotism, 
+17 it is their right, it is their duty, to throw off such Government, and to provide new Guards for their future security.
+18 Such has been the patient sufferance of these Colonies; 
+19 and such is now the necessity which constrains them to alter their former Systems of Government.
+20 The history of the present King of Great Britain is a history of repeated injuries and usurpations, 
+21 all having in direct object the establishment of an absolute Tyranny over these States.
+22 To prove this, let Facts be submitted to a candid world.
+>>>>>>> d665092746094c38f54d4bd6bd129e90c1234096
