@@ -105,96 +105,141 @@ memmove(void *vdst, const void *vsrc, int n)
   return vdst;
 }
 
-//************************************ 611 Assignment Functions **************************************************
+/* New functions inmplemented below...
+*
+*
+*
+*
+*
+*
+*
+*
+*/ 
 
-// Function to read a line from a file descriptor 'fd' into 'buf'
-// 'max_len' specifies the maximum number of characters to read
-int readline(int fd, char *buf, int max_len) {
-    int i = 0;  // Initialize an index variable 'i' to keep track of characters read.
-    char c;     // Initialize a character variable 'c' to store the read character.
 
-    // Loop until 'max_len - 1' characters have been read, or until a newline character is encountered.
-    while (i < max_len - 1) {
-        int n = read(fd, &c, 1);  // Read a single character from 'fd' into 'c'.
-        if (n <= 0 || c == '\n') {
-            break;  // Exit the loop if the read operation fails or a newline character is encountered.
-        }
-        buf[i++] = c;  // Store the read character in 'buf' and increment the index 'i'.
+
+
+
+// Reads characters until a newline character or the end of the file is encountered.
+int readline(int fd, char *buffer, int max_len) {
+  int chars_read = 0; // Number of characters read
+  char current_char; // The current character being read
+
+  for (chars_read = 0; chars_read < max_len - 1; chars_read++) {
+    // Read one character from the file descriptor
+    int read_result = read(fd, &current_char, 1);
+
+    // Check for errors or end of file
+    if (read_result <= 0 || current_char == '\n') {
+      break; // Stop reading
     }
-    buf[i] = '\0';  // Null-terminate the 'buf' string to mark the end of the line.
-    return i;  // Return the number of characters read (excluding the null terminator).
+
+    // Store the character in the buffer
+    buffer[chars_read] = current_char;
+  }
+
+  // Null-terminate the string
+  buffer[chars_read] = '\0';
+
+  return chars_read;
 }
 
-
-// Function to convert a string 'str' to lowercase
-void toLower(char *str) {
-    // Loop through each character in the string until the null terminator is encountered ('\0').
+// Converts uppercase letters in a string to lowercase.
+void convertToLowercase(char *str) {
+    // Loop through the string until the null terminator is reached
     for (int i = 0; str[i] != '\0'; i++) {
-        // Check if the current character is an uppercase letter (A-Z).
+        // Check if the character is an uppercase letter
         if (str[i] >= 'A' && str[i] <= 'Z') {
-            // Convert the uppercase character to lowercase by adding the ASCII offset.
-            // This is achieved by adding the difference between the ASCII values of 'a' and 'A'.
-            str[i] = str[i] + ('a' - 'A');
+            // Convert uppercase character to lowercase by adding 32
+            str[i] += 32;
         }
     }
 }
 
-void uniq_user(int fd, char *uflag) {
-    char current_line[80] = "";    // Current line buffer
-    char previous_line[80] = "";   // Previous line buffer
-    char previous_line_1[80] = ""; // Previous line buffer (for case-insensitive comparison)
-    char current_line_1[80] = "";  // Current line buffer (for case-insensitive comparison)
+// Identifies and prints unique lines based on the specified flag.
+void uniq_user(int fd, char *flag) {
+  char current_line[256] = "";        // Stores the current line being read
+  char previous_line[256] = "";       // Stores the previous line
+  char repeated_line[256] = ""; 
 
-    int bytesRead;                // Number of bytes read
-    int lineCount = 1;            // Line count, initialized to 1
+  int bytesRead;                      // Keeps track of the number of bytes
+  int lineCount = 1;                  // Keeps track of the consecutive line count
+  int isRepeated = 0;
+  int isCountFlag = (strcmp(flag, "-c") == 0);            // Flag for counting lines
+  int isCaseInsensitive = (strcmp(flag, "-i") == 0);      // Flag for case-insensitive
+  int isDelete = (strcmp(flag, "-d") == 0);  // Flag for deleting 
+  int isNoFlag = (strcmp(flag, "-n") == 0);
 
-    // Loop to read lines from the file descriptor 'fd' into 'current_line'
-    while ((bytesRead = readline(fd, current_line, 80)) > 0) {
-        // Check if 'previous_line' is empty (first line)
-        if (strcmp(previous_line, "") == 0) {
-            strcpy(previous_line, current_line); // Copy 'current_line' to 'previous_line'
-            lineCount = 1; // Reset the line count
-        } 
-        // Check if the '-i' flag is provided for case-insensitive comparison
-        else if (strcmp(uflag, "-i") == 0) {
-            strcpy(current_line_1, current_line); // Copy 'current_line' to 'current_line_1'
-            strcpy(previous_line_1, previous_line); // Copy 'previous_line' to 'previous_line_1'
-            toLower(current_line_1); // Convert 'current_line_1' to lowercase
-            toLower(previous_line_1); // Convert 'previous_line_1' to lowercase
-            // Compare 'current_line_1' and 'previous_line_1' for case-insensitive equality
-            if (strcmp(current_line_1, previous_line_1) != 0) {
-                // Print 'previous_line' because it's different from 'current_line'
-                printf(1, "%s\n", previous_line);
-                strcpy(previous_line, current_line); // Copy 'current_line' to 'previous_line'
-            }
-        }
-        // Case-sensitive comparison if no special flag is provided
-        else if (strcmp(current_line, previous_line) != 0) {
-            if (strcmp(uflag, "-c") == 0)
-                // Print line count and 'previous_line' for the '-c' flag
-                printf(1, "%d\t%s\n", lineCount, previous_line);
-            else if ((strcmp(uflag, "-d") == 0 && lineCount > 1) || (strcmp(uflag, "-g") == 0))
-                // Print 'previous_line' for the '-d' flag (lineCount > 1) or '-g' flag
-                printf(1, "%s\n", previous_line);
+  // Read lines from the file descriptor until the end of the file
+  while ((bytesRead = readline(fd, current_line, 256)) > 0) {
+    int isDifferent; // Flag to indicate if the current line is different from the previous
+    
+    if (isCaseInsensitive) {
+      char current_line_lowercase[256]; // Stores the lowercase version of the current line
+      char previous_line_lowercase[256]; // Stores the lowercase version of the previous line
 
-            strcpy(previous_line, current_line); // Copy 'current_line' to 'previous_line'
-            lineCount = 1; // Reset the line count
-        }  
-        else 
-            lineCount++; // Increment the line count if 'current_line' is the same as 'previous_line'
+      strcpy(current_line_lowercase, current_line);
+      convertToLowercase(current_line_lowercase);
+      strcpy(previous_line_lowercase, previous_line);
+      convertToLowercase(previous_line_lowercase);
+
+      // Compare lowercase lines for differences
+      isDifferent = strcmp(current_line_lowercase, previous_line_lowercase) != 0;
+        
+        
+    } else {
+      // Compare original lines
+      isDifferent = strcmp(current_line, previous_line) != 0;
     }
 
-    // Handle the last line if 'previous_line' is not empty
-    if (strcmp(previous_line, "") != 0) {
-        if (strcmp(uflag, "-c") == 0)
-            // Print line count and 'previous_line' for the '-c' flag
-            printf(1, "%d\t%s\n", lineCount, previous_line);
-        else if ((strcmp(uflag, "-d") == 0 && lineCount > 1) || (strcmp(uflag, "-i") == 0) || (strcmp(uflag, "-g") == 0))
-            // Print 'previous_line' for the '-d', '-i', or '-g' flag
-            printf(1, "%s\n", previous_line);
+    // Handle different lines
+    if (isDifferent) {
+      if (!strcmp(previous_line, "")) {
+        lineCount = 1; // Reset line count if the previous line was empty
+            
+      } else if (isCountFlag) {
+        printf(1, "%d  %s\n", lineCount, previous_line); // Print with line count
+            
+      } else if (isNoFlag && lineCount > 1) {
+
+          printf(1, "%s\n", previous_line); // Print only if deleting flag or no flag
+            
+      } else if (isDelete) {
+        isRepeated = 0;
+
+      } else {
+        printf(1, "%s\n", previous_line); // Always print
+        strcpy(previous_line, current_line); // Update previous_line
+      }
+            
+        
+      strcpy(previous_line, current_line); // Update previous_line
+      lineCount = 1; // Reset line count for the next unique line
+
+    } else {
+      if (isDelete && !isRepeated){
+        strcpy(repeated_line, current_line);
+        printf(1, "%s\n", previous_line);
+        isRepeated = 1;
+      }
+      lineCount++; // Increment line count for consecutive lines
     }
-    else {
-        // Print a newline if 'previous_line' was empty (no lines read)
-        printf(1, "\n");
+
+  }
+  
+  // Print the last line if necessary.
+  if (strcmp(previous_line, "") != 0) {
+    if (isCountFlag) {
+      printf(1, "%d  %s\n", lineCount, previous_line); // Print with line count
+    
+    } else if (isNoFlag || isCaseInsensitive) {
+      printf(1, "%s\n", previous_line); // Always print for -i and -n flags
     }
+
+  } else {
+    printf(1, "\n"); // Print a newline if the file was empty
+  
+  }
+
 }
+

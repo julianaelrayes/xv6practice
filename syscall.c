@@ -24,7 +24,7 @@ fetchint(uint addr, int *ip)
   *ip = *(int*)(addr);
   return 0;
 }
-
+ 
 // Fetch the nul-terminated string at addr from the current process.
 // Doesn't actually copy the string - just sets *pp to point at it.
 // Returns length of string, not including nul.
@@ -82,6 +82,7 @@ argstr(int n, char **pp)
   return fetchstr(addr, pp);
 }
 
+
 extern int sys_chdir(void);
 extern int sys_close(void);
 extern int sys_dup(void);
@@ -105,6 +106,7 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_uniq_kernel(void);
 extern int sys_head_kernel(void);
+extern int sys_new_wait(void); //***************** changed
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -130,6 +132,7 @@ static int (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_uniq_kernel] sys_uniq_kernel,
 [SYS_head_kernel] sys_head_kernel,
+[SYS_new_wait]   sys_new_wait, // ********** changed
 };
 
 void

@@ -22,3 +22,4 @@
 #define SYS_close  21
 #define SYS_uniq_kernel 22
 #define SYS_head_kernel 23
+#define SYS_new_wait 24 //*************** changed

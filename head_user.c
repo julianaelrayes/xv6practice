@@ -4,70 +4,71 @@
 
 #define DEFAULT_NLINES 14
 
-// Function to display the first 'nlines' lines of a file
-void head(int fd, int nlines) {
-    char buf[512];
-    int n = -1;
-    int lines = 0;
+// Display the first lines from the file descriptor
+void head(int fileDescriptor, int numDisplayedLines) {
+    char buffer[512];
+    int bytesRead = -1;
+    int linesDisplayed = 0;
 
-    // Read from the file descriptor 'fd' into 'buf' until 'nlines' lines are read or EOF is reached
-    while (lines < nlines && (n = read(fd, buf, sizeof(buf))) > 0) {
-        for (int i = 0; i < n; i++) {
-            if (buf[i] == '\n') {
-                lines++; // Increment line count when a newline character is encountered
-                if (lines == nlines) {
-                    break; // Exit the loop if the specified number of lines is reached
-                }
+    // Read until lines are displayed or EOF is reached.
+    while (linesDisplayed < numDisplayedLines && (bytesRead = read(fileDescriptor, buffer, sizeof(buffer))) > 0) {
+        for (int i = 0; i < bytesRead && linesDisplayed < numDisplayedLines; i++) {
+            if (buffer[i] == '\n') {
+                linesDisplayed++; 
             }
-            printf(1, "%c", buf[i]); // Print the character to the console
+            printf(1, "%c", buffer[i]); // Print character 
         }
     }
 
-    // Add an extra newline after displaying the lines
-    printf(1, "\n");
+    printf(1, "\n"); 
 }
 
-int main(int argc, char *argv[]) {
-    int nlines = DEFAULT_NLINES;
-    int fd;
-    printf(1, "********************* Head command is getting executed in user mode ******************************\n");
 
-    // Check for the presence of a command-line argument that specifies the number of lines
+int main(int argc, char *argv[]) {
+    int numLinesToDisplay = DEFAULT_NLINES;
+
+    // Display a message indicating that the 'head' command is running in user mode.
+    printf(1,"\n*** Head command is getting executed in user mode ***\n\n");
+
+    // Check for a command-line argument specifying the number of lines to display.
     if (argc > 1 && argv[1][0] == '-') {
-        nlines = atoi(&argv[1][1]); // Extract and convert the number of lines
-        if (nlines <= 0) {
+        numLinesToDisplay = atoi(&argv[1][1]); 
+        if (numLinesToDisplay <= 0) {
             printf(2, "Invalid number of lines: %s\n", argv[1]);
             exit();
         }
+        argc--; // Decrement argument count.
+        argv++; // Move to the next argument.
     }
 
-    // If there are no arguments or only a line count argument, read from standard input
+    // If no file arguments are provided, read from standard input.
     if (argc == 1 || (argc == 2 && argv[1][0] == '-')) {
-        head(0, nlines); // Read from standard input
+        head(0, numLinesToDisplay); // Read from standard input.
         exit();
     }
 
-    // Loop through the command-line arguments (file names)
+    // Process each provided file.
     for (int i = 1; i < argc; i++) {
-        if (argv[i][0] != '-' && (fd = open(argv[i], 0)) < 0) {
-            printf(2, "head: cannot open %s\n", argv[i]); // Handle file opening errors
-            exit();
+        int fileDescriptor;
+        if (argv[i][0] != '-' && (fileDescriptor = open(argv[i], 0)) < 0) {
+            printf(2, "head: cannot open %s\n", argv[i]); 
+            continue; // Continue to the next file in case of an error
         }
 
-        // Print a section header if there are multiple files
+        // Print a section header if there are multiple files.
         if (argc > 2 && argv[i][0] != '-') {
             if (i > 1) {
-                printf(1, "\n"); // Print a newline before the content of the second and subsequent files
+                printf(1, "\n");
             }
-            printf(1, "==> %s <==\n", argv[i]); // Display the current file name as a section header
+            printf(1, "%s\n\n", argv[i]); // Display the current file name as a section header.
         }
 
-        // Call the 'head' function to display the first 'nlines' lines of the current file
+        // Call the head function to display the first lines of the current file 
         if (argv[i][0] != '-') {
-            head(fd, nlines);
-            close(fd); // Close the file descriptor
+            head(fileDescriptor, numLinesToDisplay);
+            close(fileDescriptor); // Close the file descriptor 
         }
     }
 
-    exit(); // Exit the program
+    exit(); // Exit the program.
 }

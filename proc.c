@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+// #include "pstat.h"
 
 struct {
   struct spinlock lock;
@@ -13,6 +14,12 @@ struct {
 } ptable;
 
 static struct proc *initproc;
+
+// // ---- pstat ------------------------ *** changed
+// struct pstat pinfoTable[100];
+// int start_count = 0;
+
+// // --------   pstat end  --------------
 
 int nextpid = 1;
 extern void forkret(void);
@@ -88,6 +95,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p->ctime = ticks; // Set the creation time to 'ticks'
 
   release(&ptable.lock);
 
@@ -210,6 +218,8 @@ fork(void)
 
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
+  myproc()->ctime = ticks; // ****** changed 
+
   pid = np->pid;
 
   acquire(&ptable.lock);
@@ -261,6 +271,9 @@ exit(void)
     }
   }
 
+  // Set end time to ticks. **** changed
+  curproc->etime = ticks; // *****changed
+
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
   sched();
@@ -295,6 +308,58 @@ wait(void)
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
+        release(&ptable.lock);
+        return pid;
+      }
+    }
+
+    // No point waiting if we don't have any children.
+    if(!havekids || curproc->killed){
+      release(&ptable.lock);
+      return -1;
+    }
+
+    // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+    sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+  }
+}
+
+// Extended wait function, i.e. waitx syscall ***** changed whole function
+int
+new_wait(int *create_time, int *run_time, int *stop_time)
+{
+  struct proc *p;
+  int havekids, pid;
+  struct proc *curproc = myproc();
+  
+  acquire(&ptable.lock);
+  for(;;){
+    // Scan through table looking for exited children.
+    havekids = 0;
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->parent != curproc)
+        continue;
+      havekids = 1;
+      if(p->state == ZOMBIE){
+        // Found one.
+        pid = p->pid;
+        kfree(p->kstack);
+        p->kstack = 0;
+        freevm(p->pgdir);
+        p->pid = 0;
+        p->parent = 0;
+        p->name[0] = 0;
+        p->killed = 0;
+        p->state = UNUSED;
+
+        // *** changed below
+        *create_time = p->ctime;
+        *run_time = p->ttime;
+        *stop_time = p->etime;
+
+        cprintf("create = %d\nrunning = %d\nstop = %d\n", p->ctime, p->ttime, p->etime);
+        cprintf("create = %d\nrunning = %d\nstop = %d\n", create_time, run_time, stop_time);
+
         release(&ptable.lock);
         return pid;
       }

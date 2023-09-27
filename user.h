@@ -24,6 +24,8 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 
+int new_wait(int*, int*, int*); // ******** changed
+
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);
@@ -40,4 +42,4 @@ int atoi(const char*);
 
 void uniq_user(int fd,char *uflag);
 int uniq_kernel(char *filename,char *flag);
-int head_kernel(char *filename, int nlines, int inputType);
+int head_kernel(char *filename, int nlines, int inputType); 

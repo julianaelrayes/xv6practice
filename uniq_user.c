@@ -3,44 +3,38 @@
 #include "user.h"
 #include "fcntl.h"
 
-int main(int argc, char *argv[])
-{ 
-    // Print a message indicating that the Uniq command is executing in user mode.
-    printf(1, "********************* Uniq command is getting executed in user mode ******************************\n");
+int main(int argc, char *argv[]) { 
 
-    int fd = -1;
+    int fd =-1;
+    char *defaultFlag = "-n"; // Default flag if no flag is provided
+    
+    printf(1,"\n*** Uniq command is getting executed in user mode ***\n\n");
 
-    // Check the number of command-line arguments.
-    if (argc == 1) 
-        uniq_user(0, "-g");
-    else if (argc == 2)
-    {
-        // Try to open the input file specified in argv[1].
+    // If no command-line arguments provided
+    if (argc == 1) { 
+        uniq_user(0,defaultFlag); // Execute uniq_user with default flag
+
+    // If one command-line argument provided
+    } else if (argc == 2) {
+        // Attempt to open the specified input file
         if ((fd = open(argv[1], O_RDONLY)) < 0) {
-            printf(2, "Error opening input file: %s\n", argv[1]);
+            printf(2, "Failed to open the input file: %s\n", argv[1]);
             exit();
         }
 
-        // Call the uniq_user function with the file descriptor and "-g" as arguments.
-        uniq_user(fd, "-g");
-    }
-    else if (argc == 3) {
-        // Check if the first argument is a valid option (-c, -d, or -i).
-        if (argv[1][0] == '-' && (argv[1][1] == 'c' || argv[1][1] == 'd' || argv[1][1] == 'i')) {
-            // Try to open the input file specified in argv[2].
-            if ((fd = open(argv[2], O_RDONLY)) < 0) {
-                printf(2, "Error opening input file: %s\n", argv[1]);
-                exit();
-            }
+        uniq_user(fd,defaultFlag); // Execute uniq_user with default flag
 
-            // Call the uniq_user function with the file descriptor and the specified option.
-            uniq_user(fd, argv[1]);
+    // If two command-line arguments provided
+    } else if (argc == 3) {
+        // Attempt to open the specified input file
+        if ((fd = open(argv[2], O_RDONLY)) < 0) {
+            printf(2, "Failed to open the input file: %s\n", argv[1]);
+            exit();
         }
-        else
-            // Print an error message for an invalid option.
-            printf(2, "Error Invalid Option %s. The valid Options are '-c' or '-d' or '-i'\n", argv[1]);       
+
+        uniq_user(fd,argv[1]); // Execute uniq_user with the specified flag
+
     }
 
-    // Exit the program.
     exit();
 }

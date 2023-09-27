@@ -24,8 +24,9 @@ forktest(void)
     pid = fork();
     if(pid < 0)
       break;
-    if(pid == 0)
+    if(pid == 0){
       exit();
+    }
   }
 
   if(n == N){
@@ -39,7 +40,7 @@ forktest(void)
       exit();
     }
   }
-
+ 
   if(wait() != -1){
     printf(1, "wait got too many\n");
     exit();

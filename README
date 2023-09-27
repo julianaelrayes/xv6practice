@@ -1,51 +1,31 @@
-NOTE: we have stopped maintaining the x86 version of xv6, and switched
-our efforts to the RISC-V version
-(https://github.com/mit-pdos/xv6-riscv.git)
+Name: Juliana El Rayes 
+U-number: U03559866
 
-xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
-Version 6 (v6).  xv6 loosely follows the structure and style of v6,
-but is implemented for a modern x86-based multiprocessor using ANSI C.
+Environment: xv6-public on Mac (Intel). Using Ubuntu container 
 
-ACKNOWLEDGMENTS
+Important information: two text files are already called in the Makefile (uniq_example.txt and head_example.txt)
+----------------------------------------------------
+Project 1 Group:
 
-xv6 is inspired by John Lions's Commentary on UNIX 6th Edition (Peer
-to Peer Communications; ISBN: 1-57398-013-7; 1st edition (June 14,
-2000)). See also https://pdos.csail.mit.edu/6.828/, which
-provides pointers to on-line resources for v6.
+Fhaheem Tadamarry
+U5240-3753
 
-xv6 borrows code from the following sources:
-    JOS (asm.h, elf.h, mmu.h, bootasm.S, ide.c, console.c, and others)
-    Plan 9 (entryother.S, mp.h, mp.c, lapic.c)
-    FreeBSD (ioapic.c)
-    NetBSD (console.c)
+Hitesh Ulhas Vaidya
+U8746-7572
 
-The following people have made contributions: Russ Cox (context switching,
-locking), Cliff Frey (MP), Xiao Yu (MP), Nickolai Zeldovich, and Austin
-Clements.
+Juliana El Rayes
+U0355-9866
 
-We are also grateful for the bug reports and patches contributed by Silas
-Boyd-Wickizer, Anton Burtsev, Cody Cutler, Mike CAT, Tej Chajed, eyalz800,
-Nelson Elhage, Saar Ettinger, Alice Ferrazzi, Nathaniel Filardo, Peter
-Froehlich, Yakir Goaron,Shivam Handa, Bryan Henry, Jim Huang, Alexander
-Kapshuk, Anders Kaseorg, kehao95, Wolfgang Keller, Eddie Kohler, Austin
-Liew, Imbar Marinescu, Yandong Mao, Matan Shabtay, Hitoshi Mitake, Carmi
-Merimovich, Mark Morrissey, mtasm, Joel Nider, Greg Price, Ayan Shafqat,
-Eldar Sehayek, Yongming Shen, Cam Tenny, tyfkda, Rafael Ubal, Warren
-Toomey, Stephen Tu, Pablo Ventura, Xi Wang, Keiichi Watanabe, Nicolas
-Wolovick, wxdao, Grant Wu, Jindong Zhang, Icenowy Zheng, and Zou Chang Wei.
+----------------------------------------------------
+Files modified: 
 
-The code in the files that constitute xv6 is
-Copyright 2006-2018 Frans Kaashoek, Robert Morris, and Russ Cox.
+head_kernel.c: this code acts as a simple interface to a "head" functionality, allowing the user to specify the number of lines to display and the source (either standard input or a file) via command-line arguments. It prints the specified number of lines and exits. This file calls the functions from the sysproc.c file. No help needed.
 
-ERROR REPORTS
+head_user.c: The provided code is a simplified implementation of the 'head' command in xv6. It allows users to display the first few lines of specified text files or standard input. The main function processes command-line arguments, checks for the number of lines to display, and then reads and displays the specified lines from the input sources, either files or standard input. The head function handles the reading and display of lines from a file descriptor. Help from Fhaheem to implement fiole descriptor to display first lines. 
 
-We don't process error reports (see note on top of this file).
+syscall.c,syscall.h, sysproc.c, usys.S, user.h: briefly modified guiding myself from website: https://medium.com/@mahi12/adding-system-call-in-xv6-a5468ce1b463 obtained from TA (Manas)
 
-BUILDING AND RUNNING XV6
+uniq_kernel.c and uniq_user.c:  simplified implementation of the 'uniq' command. It allows users to process and manipulate text input, primarily for removing duplicate lines or displaying the count of repeated lines. When executed, the code first prints a message indicating that it's operating in kernel mode. Then, it examines the command-line arguments to determine the desired operation. If no arguments are provided, it calls the uniq_kernel function with "stdin" as the input source and "z" as the option, which effectively removes consecutive duplicate lines from standard input. If a single argument is given, it's treated as input, and the "-n" option is added when invoking uniq_kernel. In the case of two arguments, the first one is expected to be a valid option (-c, -i, or -d), and the second one is the input source. If the provided option is valid, it calls uniq_kernel with the input and the chosen option. However, if an invalid option is provided, it displays an error message suggesting the use of valid alternatives like '-c', '-i', or '-d'. Help from Hitesh of how to implement the flags from the terminal  
 
-To build xv6 on an x86 ELF machine (like Linux or FreeBSD), run
-"make". On non-x86 or non-ELF machines (like OS X, even on x86), you
-will need to install a cross-compiler gcc suite capable of producing
-x86 ELF binaries (see https://pdos.csail.mit.edu/6.828/).
-Then run "make TOOLPREFIX=i386-jos-elf-". Now install the QEMU PC
-simulator and run "make qemu".
+sysproc.c: files that kernel functions use. Help from this website: https://www.cse.iitd.ernet.in/~sbansal/os/previous_years/2011/xv6_html/syscall_8c.html#662eedd65f3e2165093842b80e3bc024 to see how to pass arguments or data from the user program to the system call. from TA (Manas)
+

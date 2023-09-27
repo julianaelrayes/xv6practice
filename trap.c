@@ -53,6 +53,12 @@ trap(struct trapframe *tf)
       ticks++;
       wakeup(&ticks);
       release(&tickslock);
+
+      // Check if the process is in the RUNNING state and not null,
+      // then increment its runtime. ***** changed 
+      if (myproc() && myproc()->state == RUNNING) {
+        myproc()->ctime++;
+      }
     }
     lapiceoi();
     break;

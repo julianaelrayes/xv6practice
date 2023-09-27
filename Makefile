@@ -27,7 +27,7 @@ OBJS = \
 	uart.o\
 	vectors.o\
 	vm.o\
-
+ 
 # Cross-compiling (e.g., on Mac OS X)
 # TOOLPREFIX = i386-jos-elf
 
@@ -181,6 +181,8 @@ UPROGS=\
 	_uniq_kernel\
 	_head_user\
 	_head_kernel\
+	_test\
+	_new_wait\
 #	_usertests\
 	_wc\
 	_zombie\
@@ -188,8 +190,8 @@ UPROGS=\
 
 
 
-fs.img: mkfs README OS611Example.txt head_example.txt $(UPROGS)
-	./mkfs fs.img README OS611Example.txt head_example.txt $(UPROGS)
+fs.img: mkfs README uniq_example.txt head_example.txt $(UPROGS)
+	./mkfs fs.img README uniq_example.txt head_example.txt $(UPROGS)
 
 -include *.d
 
@@ -202,7 +204,7 @@ clean:
 
 # make a printout
 FILES = $(shell grep -v '^\#' runoff.list)
-PRINT = runoff.list runoff.spec README head_example.txt OS611Example.txt toc.hdr toc.ftr $(FILES)
+PRINT = runoff.list runoff.spec README head_example.txt uniq_example.txt toc.hdr toc.ftr $(FILES)
 
 xv6.pdf: $(PRINT)
 	./runoff
@@ -259,7 +261,8 @@ EXTRA=\
 	printf.c umalloc.c\
 	uniq_user.c uniq_kernel.c\
 	head_user.c head_kernel.c\
-	README OS611Example.txt head_example.txt dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
+	test.c new_wait.c\
+	README uniq_example.txt head_example.txt dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 
 dist:
